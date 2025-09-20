@@ -1,0 +1,5 @@
+out/
+*.class
+*.exe
+*.log
+src/mame/
