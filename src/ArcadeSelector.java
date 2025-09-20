@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -35,30 +36,9 @@ public class ArcadeSelector extends JFrame {
 
         showPage(currentPage);
 
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_RIGHT:
-                        moveRight();
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        moveLeft();
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        moveDown();
-                        break;
-                    case KeyEvent.VK_UP:
-                        moveUp();
-                        break;
-                    case KeyEvent.VK_ENTER:
-                        launchSelectedGame();
-                        break;
-                }
-            }
-        });
+        setupKeyBindings();
 
-        setFocusable(true);
+        setVisible(true);
     }
 
     private List<Game> loadGames() {
@@ -95,6 +75,46 @@ public class ArcadeSelector extends JFrame {
 
         selectedIndex = Math.min(selectedIndex, currentGamePanel.getButtonCount() - 1);
         currentGamePanel.highlightButton(selectedIndex);
+    }
+
+    private void setupKeyBindings() {
+        InputMap im = contentPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = contentPanel.getActionMap();
+
+        im.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        am.put("moveRight", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveRight();
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
+        am.put("moveLeft", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveLeft();
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke("UP"), "moveUp");
+        am.put("moveUp", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveUp();
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
+        am.put("moveDown", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                moveDown();
+            }
+        });
+
+        im.put(KeyStroke.getKeyStroke("ENTER"), "launchGame");
+        am.put("launchGame", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                launchSelectedGame();
+            }
+        });
     }
 
     private void moveRight() {
@@ -151,8 +171,17 @@ public class ArcadeSelector extends JFrame {
         int gameIndex = currentPage * 9 + selectedIndex;
         if (gameIndex < allGames.size()) {
             Game game = allGames.get(gameIndex);
+            String romName = game.getFileName().replace(".zip", "");
+
             try {
-                new ProcessBuilder(MAME_EXE, ROMS_DIR + "\\" + game.getFileName()).start();
+                ProcessBuilder pb = new ProcessBuilder(
+                        MAME_EXE,
+                        romName,
+                        "-rompath", ROMS_DIR
+                );
+
+                // No establecemos directory(), se ejecuta desde la carpeta donde se lanza Java
+                pb.start();
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "No se pudo ejecutar el juego: " + e.getMessage());
             }
@@ -160,6 +189,6 @@ public class ArcadeSelector extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ArcadeSelector().setVisible(true));
+        SwingUtilities.invokeLater(() -> new ArcadeSelector());
     }
 }
