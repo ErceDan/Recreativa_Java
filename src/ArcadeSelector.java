@@ -21,8 +21,12 @@ public class ArcadeSelector extends JFrame {
 
     public ArcadeSelector() {
         setTitle("Arcade Selector");
-        setSize(800, 600);
+        /*        setSize(1920, 1080); */
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setUndecorated(true);
+
+        // Maximiza la ventana
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
         allGames = loadGames();
@@ -75,6 +79,8 @@ public class ArcadeSelector extends JFrame {
 
         selectedIndex = Math.min(selectedIndex, currentGamePanel.getButtonCount() - 1);
         currentGamePanel.highlightButton(selectedIndex);
+        currentGamePanel.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100)); // top,left,bottom,right
+
     }
 
     private void setupKeyBindings() {
